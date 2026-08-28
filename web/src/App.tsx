@@ -9,7 +9,6 @@ import {
   Sun,
   TriangleAlert,
 } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -57,8 +56,11 @@ function useTheme() {
   return { dark, toggle: () => setDark((d) => !d) }
 }
 
-function LocalNoCell({ localNo }: { localNo: string }) {
+function LocalNoCell({ localNo, large }: { localNo: string; large?: boolean }) {
   const [copied, setCopied] = useState(false)
+  const numberClass = large
+    ? "font-mono text-lg font-bold tabular-nums"
+    : "font-mono text-base font-semibold tabular-nums"
 
   const copy = async () => {
     try {
@@ -75,15 +77,13 @@ function LocalNoCell({ localNo }: { localNo: string }) {
       {isDialable(localNo) ? (
         <a
           href={`tel:${localNo}`}
-          className="font-mono text-base font-semibold tabular-nums text-primary hover:underline"
+          className={`${numberClass} text-primary hover:underline`}
           title={`Dial ${localNo}`}
         >
           {localNo}
         </a>
       ) : (
-        <span className="font-mono text-base font-semibold tabular-nums">
-          {localNo}
-        </span>
+        <span className={numberClass}>{localNo}</span>
       )}
       <Button
         variant="ghost"
@@ -98,11 +98,23 @@ function LocalNoCell({ localNo }: { localNo: string }) {
   )
 }
 
-function SectionBadge({ entry }: { entry: DirectoryEntry }) {
-  if (entry.category === "Individual") {
-    return <Badge variant="secondary">Individual</Badge>
-  }
-  return <Badge variant="outline">{entry.section || "Office/Area"}</Badge>
+function EntryName({ entry, large }: { entry: DirectoryEntry; large?: boolean }) {
+  return (
+    <div className="min-w-0 text-left">
+      <p
+        className={
+          large
+            ? "break-words text-lg font-semibold leading-tight"
+            : "break-words font-medium"
+        }
+      >
+        {entry.fullName}
+      </p>
+      {entry.category === "Office/Area" && entry.section && (
+        <p className="mt-0.5 text-xs text-muted-foreground">{entry.section}</p>
+      )}
+    </div>
+  )
 }
 
 function EntryTable({ entries }: { entries: DirectoryEntry[] }) {
@@ -112,16 +124,14 @@ function EntryTable({ entries }: { entries: DirectoryEntry[] }) {
         <TableHeader>
           <TableRow>
             <TableHead>Name / Location</TableHead>
-            <TableHead>Section</TableHead>
             <TableHead className="text-right">Local No.</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {entries.map((e) => (
             <TableRow key={e.id}>
-              <TableCell className="font-medium">{e.fullName}</TableCell>
               <TableCell>
-                <SectionBadge entry={e} />
+                <EntryName entry={e} />
               </TableCell>
               <TableCell className="text-right">
                 <LocalNoCell localNo={e.localNo} />
@@ -139,14 +149,11 @@ function EntryCards({ entries }: { entries: DirectoryEntry[] }) {
     <div className="flex flex-col gap-2 md:hidden">
       {entries.map((e) => (
         <Card key={e.id} className="py-3">
-          <CardContent className="flex items-center justify-between gap-3 px-4">
-            <div className="min-w-0">
-              <p className="truncate font-medium">{e.fullName}</p>
-              <div className="mt-1">
-                <SectionBadge entry={e} />
-              </div>
+          <CardContent className="flex w-full flex-row items-center justify-between gap-3 px-4">
+            <EntryName entry={e} large />
+            <div className="shrink-0">
+              <LocalNoCell localNo={e.localNo} large />
             </div>
-            <LocalNoCell localNo={e.localNo} />
           </CardContent>
         </Card>
       ))}
