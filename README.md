@@ -47,7 +47,3 @@ https://bl4cktea.github.io/fghpc-directory/.
 2. Optionally update the date in the **Meta** tab (shown in the site footer).
 3. Wait up to 5 minutes (API cache), or run `clearCache()` in the Apps Script
    editor for an immediate refresh.
-
-## Full plan
-
-See [PLAN.md](PLAN.md) for the architecture decisions and build phases.
