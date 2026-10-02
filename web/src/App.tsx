@@ -4,6 +4,7 @@ import {
   Check,
   Moon,
   Phone,
+  Printer,
   RefreshCw,
   Search,
   Sun,
@@ -22,7 +23,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { PrintDirectory } from "@/components/PrintDirectory"
 import { fetchDirectory, type FetchResult } from "@/lib/api"
+import { DIAL_NOTES, TRUNK_LINES } from "@/lib/trunk-lines"
 import type { DirectoryEntry } from "@/lib/types"
 
 const SECTION_ORDER = ["Housing Compound", "CHEP", "MHEP", "PHEP"]
@@ -180,6 +183,7 @@ export default function App() {
   const [query, setQuery] = useState("")
   const [tab, setTab] = useState<CategoryTab>("all")
   const [section, setSection] = useState<string | null>(null)
+  const [showDialNotes, setShowDialNotes] = useState(false)
 
   const load = () => {
     setLoading(true)
@@ -193,6 +197,10 @@ export default function App() {
   useEffect(load, [])
 
   const entries = result?.payload.entries ?? []
+
+  const printDirectory = () => {
+    if (entries.length > 0) window.print()
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -210,7 +218,8 @@ export default function App() {
   }, [entries, query, tab, section])
 
   return (
-    <div className="min-h-svh bg-background">
+    <>
+    <div className="min-h-svh bg-background print:hidden">
       <header className="border-b bg-card">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-4 px-4 py-5">
           <div className="flex items-center gap-3">
@@ -226,14 +235,26 @@ export default function App() {
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggle}
-            aria-label="Toggle dark mode"
-          >
-            {dark ? <Sun className="size-5" /> : <Moon className="size-5" />}
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={printDirectory}
+              disabled={loading || entries.length === 0}
+              aria-label="Print directory (A4)"
+              title="Print directory (A4)"
+            >
+              <Printer className="size-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggle}
+              aria-label="Toggle dark mode"
+            >
+              {dark ? <Sun className="size-5" /> : <Moon className="size-5" />}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -250,6 +271,38 @@ export default function App() {
             Offline — showing the last saved copy of the directory.
           </div>
         )}
+
+        <div className="mb-4 rounded-lg border bg-card px-4 py-3">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Trunk lines
+            </span>
+            {TRUNK_LINES.map((t) => (
+              <a
+                key={t.tel}
+                href={`tel:${t.tel}`}
+                className="font-mono text-sm font-semibold tabular-nums hover:underline"
+              >
+                {t.display}
+              </a>
+            ))}
+            <button
+              type="button"
+              onClick={() => setShowDialNotes((v) => !v)}
+              aria-expanded={showDialNotes}
+              className="text-xs text-muted-foreground underline decoration-dotted underline-offset-2 hover:text-foreground"
+            >
+              {showDialNotes ? "Show less" : "Learn more"}
+            </button>
+          </div>
+          {showDialNotes && (
+            <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">
+              {DIAL_NOTES.map((n) => (
+                <li key={n}>{n}</li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         <div className="flex flex-col gap-3">
           <div className="relative">
@@ -329,11 +382,27 @@ export default function App() {
 
         {result?.payload.updatedAt && (
           <footer className="mt-8 border-t pt-4 text-center text-xs text-muted-foreground">
-            First Gen Hydro Power Corporation — directory last updated{" "}
-            {result.payload.updatedAt}
+            First Gen Hydro Power Corporation —{" "}
+            <button
+              type="button"
+              onClick={printDirectory}
+              title="Print directory (A4)"
+              className="inline-flex items-center gap-1 font-medium underline decoration-dotted underline-offset-2 hover:text-foreground"
+            >
+              <Printer className="size-3" />
+              directory
+            </button>{" "}
+            last updated {result.payload.updatedAt}
           </footer>
         )}
       </main>
     </div>
+    <PrintDirectory
+      entries={entries}
+      updatedAt={result?.payload.updatedAt}
+      isStale={result?.isStale}
+      isSample={result?.isSample}
+    />
+    </>
   )
 }
