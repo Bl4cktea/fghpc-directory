@@ -15,7 +15,7 @@ function lastNameKey(fullName: string) {
 function Group({ title, entries }: { title: string; entries: DirectoryEntry[] }) {
   if (entries.length === 0) return null
   return (
-    <section className="mb-4">
+    <section className="mb-3">
       <h2 className="break-after-avoid border-b border-black pb-0.5 text-[10pt] font-bold uppercase tracking-wide">
         {title}
       </h2>
@@ -23,8 +23,8 @@ function Group({ title, entries }: { title: string; entries: DirectoryEntry[] })
         <tbody>
           {entries.map((e) => (
             <tr key={e.id} className="break-inside-avoid border-b border-gray-300">
-              <td className="py-[3px] pr-2">{e.fullName}</td>
-              <td className="py-[3px] text-right font-bold tabular-nums">{e.localNo}</td>
+              <td className="py-[2px] pr-2">{e.fullName}</td>
+              <td className="py-[2px] text-right font-bold tabular-nums">{e.localNo}</td>
             </tr>
           ))}
         </tbody>
