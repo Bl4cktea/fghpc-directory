@@ -183,6 +183,7 @@ export default function App() {
   const [query, setQuery] = useState("")
   const [tab, setTab] = useState<CategoryTab>("all")
   const [section, setSection] = useState<string | null>(null)
+  const [showDialNotes, setShowDialNotes] = useState(false)
 
   const load = () => {
     setLoading(true)
@@ -285,12 +286,22 @@ export default function App() {
                 {t.display}
               </a>
             ))}
+            <button
+              type="button"
+              onClick={() => setShowDialNotes((v) => !v)}
+              aria-expanded={showDialNotes}
+              className="text-xs text-muted-foreground underline decoration-dotted underline-offset-2 hover:text-foreground"
+            >
+              {showDialNotes ? "Show less" : "Learn more"}
+            </button>
           </div>
-          <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">
-            {DIAL_NOTES.map((n) => (
-              <li key={n}>{n}</li>
-            ))}
-          </ul>
+          {showDialNotes && (
+            <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">
+              {DIAL_NOTES.map((n) => (
+                <li key={n}>{n}</li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="flex flex-col gap-3">
