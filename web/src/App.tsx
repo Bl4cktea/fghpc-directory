@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/table"
 import { PrintDirectory } from "@/components/PrintDirectory"
 import { fetchDirectory, type FetchResult } from "@/lib/api"
+import { DIAL_NOTES, TRUNK_LINES } from "@/lib/trunk-lines"
 import type { DirectoryEntry } from "@/lib/types"
 
 const SECTION_ORDER = ["Housing Compound", "CHEP", "MHEP", "PHEP"]
@@ -269,6 +270,28 @@ export default function App() {
             Offline — showing the last saved copy of the directory.
           </div>
         )}
+
+        <div className="mb-4 rounded-lg border bg-card px-4 py-3">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Trunk lines
+            </span>
+            {TRUNK_LINES.map((t) => (
+              <a
+                key={t.tel}
+                href={`tel:${t.tel}`}
+                className="font-mono text-sm font-semibold tabular-nums hover:underline"
+              >
+                {t.display}
+              </a>
+            ))}
+          </div>
+          <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">
+            {DIAL_NOTES.map((n) => (
+              <li key={n}>{n}</li>
+            ))}
+          </ul>
+        </div>
 
         <div className="flex flex-col gap-3">
           <div className="relative">

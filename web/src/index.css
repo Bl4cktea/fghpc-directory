@@ -131,12 +131,17 @@
 
 @page {
   size: A4 portrait;
-  margin: 12mm 12mm 16mm;
+  margin: 10mm;
 }
 
 @media print {
   html,
   body {
     background: #fff !important;
+  }
+  /* keep the coloured bands/zebra rows when printing */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
