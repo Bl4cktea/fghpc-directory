@@ -4,6 +4,7 @@ import {
   Check,
   Moon,
   Phone,
+  Printer,
   RefreshCw,
   Search,
   Sun,
@@ -22,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { PrintDirectory } from "@/components/PrintDirectory"
 import { fetchDirectory, type FetchResult } from "@/lib/api"
 import type { DirectoryEntry } from "@/lib/types"
 
@@ -194,6 +196,10 @@ export default function App() {
 
   const entries = result?.payload.entries ?? []
 
+  const printDirectory = () => {
+    if (entries.length > 0) window.print()
+  }
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     return entries.filter((e) => {
@@ -210,7 +216,8 @@ export default function App() {
   }, [entries, query, tab, section])
 
   return (
-    <div className="min-h-svh bg-background">
+    <>
+    <div className="min-h-svh bg-background print:hidden">
       <header className="border-b bg-card">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-4 px-4 py-5">
           <div className="flex items-center gap-3">
@@ -226,14 +233,26 @@ export default function App() {
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggle}
-            aria-label="Toggle dark mode"
-          >
-            {dark ? <Sun className="size-5" /> : <Moon className="size-5" />}
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={printDirectory}
+              disabled={loading || entries.length === 0}
+              aria-label="Print directory (A4)"
+              title="Print directory (A4)"
+            >
+              <Printer className="size-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggle}
+              aria-label="Toggle dark mode"
+            >
+              {dark ? <Sun className="size-5" /> : <Moon className="size-5" />}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -329,11 +348,27 @@ export default function App() {
 
         {result?.payload.updatedAt && (
           <footer className="mt-8 border-t pt-4 text-center text-xs text-muted-foreground">
-            First Gen Hydro Power Corporation — directory last updated{" "}
-            {result.payload.updatedAt}
+            First Gen Hydro Power Corporation —{" "}
+            <button
+              type="button"
+              onClick={printDirectory}
+              title="Print directory (A4)"
+              className="inline-flex items-center gap-1 font-medium underline decoration-dotted underline-offset-2 hover:text-foreground"
+            >
+              <Printer className="size-3" />
+              directory
+            </button>{" "}
+            last updated {result.payload.updatedAt}
           </footer>
         )}
       </main>
     </div>
+    <PrintDirectory
+      entries={entries}
+      updatedAt={result?.payload.updatedAt}
+      isStale={result?.isStale}
+      isSample={result?.isSample}
+    />
+    </>
   )
 }

@@ -128,3 +128,15 @@
     @apply font-sans;
     }
 }
+
+@page {
+  size: A4 portrait;
+  margin: 12mm 12mm 16mm;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+  }
+}
